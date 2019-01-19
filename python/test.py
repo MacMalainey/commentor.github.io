@@ -14,7 +14,6 @@ def spawnEnemies(count, multiplier):
     else:
         return (False, count, multiplier)
 
-
 # Handles the reset screen
 def reset(player1, all_enemies, PLAYER_HEALTH, WIDTH, HEIGHT, screen, all_graves, all_armies, all_powerups):
     for i in all_enemies:
@@ -68,7 +67,7 @@ def wizard_touching(player1, all_enemies, WIDTH, HEIGHT, all_graves):
         player1.health -= 1
 
 def grave_touching(player1, all_graves, all_armies, grave_counter):
-        # if the player sprite collides with the graveyard sprite, instantiate an army, add it the army group then killsdasdasdasdasdsadadasdsadasdsadasdasdasdasdasdasdas
+        # if the player sprite collides with the graveyard sprite, instantiate an army, add it the army group then kill
         grave_touch = pygame.sprite.spritecollideany(player1, all_graves)
         if grave_touch:
             if grave_counter != 0:

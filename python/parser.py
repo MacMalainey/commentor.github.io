@@ -37,7 +37,7 @@ def format_file(file_info, mode):
         elif len(line) <= 2: # ignore lines that are length 2 or less
             pass
         else:
-            stripped_lines.append(line.strip())    # strip new lines
+            stripped_lines.append(line.strip())    # strip blank space
 
     # Pass 2, checks file again after whitespace is removed
     for line in stripped_lines:
@@ -59,16 +59,19 @@ def count_lines(formatted_info, mode):
     return counter
 
 # Counts number of lines with comments
-def count_comments(formatted_info, mode):
+def count_comments_and_code(formatted_info, mode):
 
-    comment_sym = ["#"] # Legal comment symbols
-    comment_sym_multi = ['"""'] # Legal multiline comment symbols
-    counter = 0
+    comment_sym = ["#", "//"] # Legal comment symbols
+    comment_sym_multi = ['"""', "/*"] # Legal multiline comment symbols
+    comment_counter = 0
+    code_counter = 0
 
     for line in formatted_info:
-        counter += find_comment(line, comment_sym[mode], comment_sym_multi[mode])
+        temp_comment_counter, temp_code_counter = find_comment(line, comment_sym[mode], comment_sym_multi[mode])
+        comment_counter += temp_comment_counter
+        code_counter += temp_code_counter
 
-    return counter
+    return comment_counter, code_counter
 
 # Determine number of comments based off of defined length of "single" comment
 def determine_number_of_comments(comment_length):
@@ -84,7 +87,7 @@ def find_comment(line, comment_sym, comment_sym_multi):
     # If we are in the middle of a multiline comment, add the characters to the sum and return 0
     if (multi_comment_flag == 1) and (comment_sym_multi not in line):
         multi_comment_char_sum += len(line)
-        return 0
+        return 0, 0
 
     # multiline comments
     elif comment_sym_multi in line:
@@ -92,7 +95,7 @@ def find_comment(line, comment_sym, comment_sym_multi):
         if multi_comment_flag == 0:
             multi_comment_char_sum += len(line)
             multi_comment_flag = 1
-            return 0
+            return 0, 0
         else:
             multi_comment_char_sum += len(line) - len(comment_sym_multi) * 2 #subtract off the length of the symbols
             multi_comment_flag = 0
@@ -100,11 +103,11 @@ def find_comment(line, comment_sym, comment_sym_multi):
             comment_len = determine_number_of_comments(multi_comment_char_sum)
 
             multi_comment_char_sum = 0
-            return comment_len
+            return comment_len, 0
 
     # single line comments
     elif line[0:len(comment_sym)] == comment_sym:  # If we detect a comment at the beginning of a line
-        return determine_number_of_comments(len(line))
+        return determine_number_of_comments(len(line)), 0
 
     # inline comments
     elif comment_sym in line:
@@ -119,19 +122,34 @@ def find_comment(line, comment_sym, comment_sym_multi):
             line = line.replace("'" + phrase2.group() + "'", '')
             return find_comment(line, comment_sym, comment_sym_multi) # Recurse with text removed
         else:
-            return determine_number_of_comments(len(line))
+            return determine_number_of_comments(len(line)), 1
 
     else:
-        return 0
+        return 0, 1
 
 # Modes:
 # -1: We will not parse this
 # 0: python
+# 1: c++
 def pick_mode(file_name):
     if file_name[-3:] == ".py": # the mode is python
         return 0
+    if file_name[-3:] == ".cpp": # the mode is c++
+        return 1
     else:
         return -1
+
+# Returns in this order: line count, comment count, code count
+# -1, -1, -1 is returned if it is not a valid file
+def parse_code(file_name, file_contents):
+    mode = pick_mode(file_name)
+    if mode == -1: # if mode is -1 we will not parse this file
+        return -1, -1, -1
+    else:
+        formatted_info = format_file(file_contents, mode) # format the file
+        line_count = count_lines(formatted_info, mode)
+        comment_count, code_count = count_comments_and_code(formatted_info, mode)
+        return line_count, comment_count, code_count
 
 
 if __name__ == "__main__":
@@ -143,5 +161,7 @@ if __name__ == "__main__":
     else:
         formatted_info = format_file(file_info, mode) # format the file
         line_count = count_lines(formatted_info, mode)
-        comment_count = count_comments(formatted_info, mode)
+        comment_count, code_count = count_comments_and_code(formatted_info, mode)
+        print(line_count)
         print(comment_count)
+        print(code_count)
