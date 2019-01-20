@@ -69,16 +69,12 @@ def count_comments_and_code(formatted_info, mode):
     global comment_sym, comment_sym_multi
     comment_counter = 0
     code_counter = 0
-
     for line in formatted_info:
         if (line == formatted_info[-1]): # Edge case for people who don't end their multiline comments
-            temp_comment_counter, temp_code_counter = find_comment(line, comment_sym[mode], comment_sym_multi[mode], 1)
+            temp_comment_counter, temp_code_counter = find_comment(line, comment_sym[mode], comment_sym_multi[mode], 1, mode)
         else:
-            try:    # Sometimes we get a none type, so we need this, returns 0 cuz this is an error
-                temp_comment_counter, temp_code_counter = find_comment(line, comment_sym[mode], comment_sym_multi[mode], 0)
-                edge_case_line = formatted_info.index(line)
-            except:
-                return 0, 0
+            temp_comment_counter, temp_code_counter = find_comment(line, comment_sym[mode], comment_sym_multi[mode], 0, mode)
+            edge_case_line = formatted_info.index(line)
 
         if temp_comment_counter == -1: # Edge case for files that don't end their multiline comments
             comment_counter += len(formatted_info) - edge_case_line - 1
@@ -97,7 +93,7 @@ def determine_number_of_comments(comment_length):
     else:
         return round(comment_length / comment_length_constant)
 
-def find_comment(line, comment_sym, comment_sym_multi, last_line):
+def find_comment(line, comment_sym, comment_sym_multi, last_line, mode):
     global multi_comment_flag, multi_comment_char_sum
 
     #multiline comments on one line
@@ -147,11 +143,11 @@ def find_comment(line, comment_sym, comment_sym_multi, last_line):
         if(phrase):
             # remove text from line
             line = line.replace('"' + phrase.group() + '"', '')
-            return find_comment(line, comment_sym, comment_sym_multi, 0) # Recurse with text removed
+            return find_comment(line, comment_sym, comment_sym_multi, 0, mode) # Recurse with text removed
         elif(phrase2):
             # remove text from line
             line = line.replace("'" + phrase2.group() + "'", '')
-            return find_comment(line, comment_sym, comment_sym_multi, 0) # Recurse with text removed
+            return find_comment(line, comment_sym, comment_sym_multi, 0, mode) # Recurse with text removed
         else:
             return determine_number_of_comments(len(line)), 1
 
@@ -170,7 +166,7 @@ def pick_mode(file_name):
     # the mode is c++, c, cs, java, javascript, kotlin
     if file_name.lower()[-4:] == ".cpp" or file_name.lower()[-2:] == ".c" or file_name.lower()[-3:] == ".cs" \
     or file_name.lower()[-5::] == ".java" or file_name.lower()[-3::] == ".js" or file_name.lower()[-3:] ==".kt"\
-    or file_name.lower()[-6::] == ".swift" or file_name.lower()[-3::] == ".js":
+    or file_name.lower()[-6::] == ".swift":
         return 1
     else:
         return -1
