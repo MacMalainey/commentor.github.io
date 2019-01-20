@@ -151,15 +151,18 @@ def find_comment(line, comment_sym, comment_sym_multi, last_line):
         return 0, 1
 
 # Modes:
+# No Ojbective C due to .m also being used for matlab files
 # -1: We will not parse this
 # 0: python
-# 1: c++ or c or cs or java or javascript
+# 1: c++, c, cs, java, javascript, kotlin
 def pick_mode(file_name):
     # the mode is python
     if file_name[-3:] == ".py":
         return 0
-    # the mode is c++ or c or cs java or javascript
-    if file_name[-4:] == ".cpp" or file_name[-2:] == ".c" or file_name[-3:] == ".cs" or file_name[-5::] == ".java" or file_name[-3::] == ".js":
+    # the mode is c++, c, cs, java, javascript, kotlin
+    if file_name[-4:] == ".cpp" or file_name[-2:] == ".c" or file_name[-3:] == ".cs" \
+    or file_name[-5::] == ".java" or file_name[-3::] == ".js" or file_name[-3:] ==".kt"\
+    or file_name[-6::] == ".swift":
         return 1
     else:
         return -1
