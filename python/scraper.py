@@ -34,14 +34,12 @@ class scraper(threading.Thread):
         folder = repo.get_dir_contents(path)
         for file in folder:
             if file.type == 'file':
-                print(file.name)
-                # nline, ncomment, ncode = parse_code(file.name, b64decode(file.get_contents))
-                # line += nline
-                # comment += ncomment
-                # code += ncode
+                nline, ncomment, ncode = parse_code(file.name, b64decode(file.get_contents))
+                line += nline
+                comment += ncomment
+                code += ncode
             elif file.type == 'dir':
-                # line, comment, code = 
-                self.parse_folder(repo, path + file.name + '/', line, comment, code)
+                line, comment, code = self.parse_folder(repo, path + file.name + '/', line, comment, code)
             # return line, comment, code
     
     def run(self):
@@ -50,11 +48,10 @@ class scraper(threading.Thread):
         # while not self.local.terminate:
         repo = poll_repo()
         # Getting repo information
-        # line, comment, code = 
-        self.parse_folder(repo, "/", 0, 0, 0)
+        line, comment, code = self.parse_folder(repo, "/", 0, 0, 0)
 
-        # print("For repo " + repo.name)
-        # print("Lines: " + line + " Comments:" + comment + "Code:" + code)
+        print("For repo " + repo.name)
+        print("Lines: " + line + " Comments:" + comment + "Code:" + code)
 
 
 

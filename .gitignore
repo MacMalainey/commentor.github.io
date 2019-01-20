@@ -24,3 +24,4 @@ yarn-error.log*
 
 #private-keys
 python/private.py
+python/__pycache__/
