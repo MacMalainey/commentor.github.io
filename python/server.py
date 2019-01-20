@@ -1,16 +1,6 @@
-import threading
-import atexit
 from flask import Flask
+app = Flask(__name__)
 
-# Set number of running threads
-THREAD_NUM = 5
-
-def start_app():
-    app = Flask(__name__)
-
-    # Cancel background threads
-    def interrupt():
-        pass
-
-
-start_app()
+@app.route('/')
+def hello_world():
+    return 'Hello, World!'
