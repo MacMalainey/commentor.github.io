@@ -4,6 +4,7 @@ import threading
 from custom_parser import parse_code, pick_mode
 from base64 import b64decode
 from time import sleep, time
+from store import add_data, setup
 
 gcontext = Github(private.GITHUB_API_KEY)
 repos = []
@@ -16,9 +17,10 @@ def begin(thread_count):
     global current_repo, repos, threads
     if threads is not None:
         raise Exception()
-    current_repo = 96538378
+    current_repo = 0
     repos = gcontext.get_repos()
     threads = [None] * thread_count
+    setup()
     for i in range(0, thread_count):
         threads[i] = scraper()
         threads[i].start()
@@ -60,7 +62,6 @@ class scraper(threading.Thread):
                     line += nline
                     comment += ncomment
                     code += ncode
-                    print(__name__ + " lines done: " + str(line))
             elif file.type == 'dir':
                 line, comment, code = self.parse_folder(repo, path + file.name + '/', line, comment, code)
         return line, comment, code
@@ -69,14 +70,17 @@ class scraper(threading.Thread):
         self.local = threading.local()
         self.local.terminate = False
         # while not self.local.terminate:
-        repo = poll_repo()
-        while repo is None:
+        while not self.local.terminate:
             repo = poll_repo()
-        # Getting repo information
-        line, comment, code = self.parse_folder(repo, "/", 0, 0, 0)
+            while repo is None:
+                repo = poll_repo()
+            # Getting repo information
+            line, comment, code = self.parse_folder(repo, "/", 0, 0, 0)
+            print("For repo " + repo.name)
+            print("Lines: " + str(line) + " Comments:" + str(comment) + "Code:" + str(code))
+            if line > 0:
+                add_data(current_repo, repo, code, comment, gcontext)
 
-        print("For repo " + repo.name)
-        print("Lines: " + str(line) + " Comments:" + str(comment) + "Code:" + str(code))
 
 
 
