@@ -24,3 +24,10 @@ yarn-error.log*
 
 #private-keys
 python/private.py
+
+# Parser test files
+python/out
+python/test_module.py
+python/test.cpp
+python/test.py
+

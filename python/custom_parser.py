@@ -30,8 +30,13 @@ def format_file(file_info, mode):
     global comment_sym, comment_sym_multi
     stripped_lines = []
     formatted_lines = []
-    lines = file_info.readlines()
-    file_info.close()
+    if __name__ == "__main__":
+        lines = file_info.readlines()
+        file_info.close()
+        print(lines)
+    else:
+        lines = file_info.split("\n")
+        print(lines)
 
     # remove new line characters from the text and strip blankspace
     for line in lines:
