@@ -74,7 +74,7 @@ def count_comments_and_code(formatted_info, mode):
         if (line == formatted_info[-1]): # Edge case for people who don't end their multiline comments
             temp_comment_counter, temp_code_counter = find_comment(line, comment_sym[mode], comment_sym_multi[mode], 1)
         else:
-            try:    # Sometimes we get a none type, so we need this
+            try:    # Sometimes we get a none type, so we need this, returns 0 cuz this is an error
                 temp_comment_counter, temp_code_counter = find_comment(line, comment_sym[mode], comment_sym_multi[mode], 0)
                 edge_case_line = formatted_info.index(line)
             except:
@@ -171,15 +171,19 @@ def pick_mode(file_name):
         return -1
 
 # Returns in this order: line count, comment count, code count
-# -1, -1, -1 is returned if it is not a valid file
+# 0, 0, 0 is returned if it is not a valid file
 def parse_code(file_name, file_contents):
     mode = pick_mode(file_name)
     if mode == -1: # if mode is -1 we will not parse this file
-        return -1, -1, -1
+        return 0, 0, 0
     else:
         formatted_info = format_file(file_contents, mode) # format the file
         line_count = count_lines(formatted_info, mode)
         comment_count, code_count = count_comments_and_code(formatted_info, mode)
+
+        # If we have no comments and no lines, something went wrong. just set the lines to 0 and assume this is a file we will skip
+        if(comment_count == 0 and code_count == 0):
+            line_count == 0
         return line_count, comment_count, code_count
 
 
