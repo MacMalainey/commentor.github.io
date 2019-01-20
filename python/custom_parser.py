@@ -99,9 +99,14 @@ def determine_number_of_comments(comment_length):
 
 def find_comment(line, comment_sym, comment_sym_multi, last_line):
     global multi_comment_flag, multi_comment_char_sum
+
     #multiline comments on one line
     if(comment_sym_multi in line):
-        phrase = re.search('/\*.*?\*/', line) # For cpp, c, c#
+        if(mode == 0):
+            phrase = re.search('\"\"\".*?\"\"\"', line) # For python
+        elif(mode == 1):
+            phrase = re.search('/\*.*?\*/', line) # For cpp, c, c#
+
         if(phrase):
             return determine_number_of_comments(len(line)), 0;
 
