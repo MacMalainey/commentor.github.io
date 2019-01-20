@@ -10,7 +10,6 @@ var start = false;
 
 
 function titleScreen(){
-if (start == false) {
   writing = writing + 8;
   titleTransition=titleTransition+2;
   titleTransitionWhite= titleTransitionWhite+2;
@@ -35,11 +34,6 @@ if (start == false) {
   textFont('monospace', 50);
   textSize(17);
   text('Mac Malainey, Hudson Shykowski, Richmond Naviza, Lora Ma', 618 , 278, 600, 50);
-}
-else if (start == true) {
-  fill('white');
-
-}
 }
 
 function triangles(){
