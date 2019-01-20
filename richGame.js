@@ -1,3 +1,6 @@
+var xAxis = 'x-axis';
+var yAxis = 'y-axis';
+
 // xCor, yCor
 // R G B opacity
 // fill(color(255, 255, 255, titleTransitionWhite));
@@ -5,8 +8,7 @@ function printXlabel(xCor, yCor, key) {
   console.log("we really here");
   fill(0, 102, 153);
   textSize(32);
-  text('word',xCor, yCor);
-}
+  text('array',xCor, yCor);
 
 // colour is a string of the hex value of the colour with # infront
 // this function draws with shadows
@@ -49,7 +51,7 @@ function richGame(diccionario) {
   var xAxisLength = i*(barSpace+barWidth) + firstBarSpace;
 
   //print the box starting from the base to the top
-  fill('#000000');
+  fill('white');
 
   // this is the horizontal line
   rect(baseX, baseY + 3,xAxisLength,3);
@@ -64,6 +66,6 @@ function richGame(diccionario) {
 
 function endGame(initDimensions) {
   console.log("End Game");
-  background('#000000');
+  background('white');
   drawBox(0,0,initDimensions[0], initDimensions[1]);
 }

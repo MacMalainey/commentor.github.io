@@ -1,5 +1,5 @@
-
-var fade = 0;
+var xAxis = 'x-axis';
+var yAxis = 'y-axis';
 var page = 0;
 var initDimensions = (0,0);
 
@@ -75,6 +75,7 @@ function draw() {
   if (page) {
     console.log(page);
     richGame(diccList[page]);
+    text('START', 715 , 475, 600, 50);
   }
  else if (page >= diccList.length) {
     endGame();
