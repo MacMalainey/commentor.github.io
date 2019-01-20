@@ -6,11 +6,9 @@ var buttonX = 300;
 var buttonY = 100;
 var coordinateX = 600;
 var coordinateY = 440;
-var start = 0;
 
 
 function titleScreen(){
-if (start == 0) {
   writing = writing + 8;
   titleTransition=titleTransition+2;
   titleTransitionWhite= titleTransitionWhite+2;
@@ -35,11 +33,8 @@ if (start == 0) {
   textFont('monospace', 50);
   textSize(17);
   text('Mac Malainey, Hudson Shykowski, Richmond Naviza, Lora Ma', 618 , 278, 600, 50);
-}
-else if (start > 0) {
-  fill(color(255, 255, 255));
-  rect(0 , 0, windowWidth, windowHeight, 5, 5, 5, 5);
-}
+
+
 }
 
 function triangles(){
@@ -55,16 +50,5 @@ function triangles(){
 }
 
 function begoneTHOT(){
-
-    for (i = 0; i < 255; i++){
-      buttonX = buttonX + 45;
-      buttonY = buttonY + 45;
-      coordinateX = coordinateX - 15;
-      coordinateY = coordinateY - 15;
-      buttonPressed++;
-      fill(color(162, 188, 229, titleTransition));
-      rect(coordinateX + 10, coordinateY + 10, buttonX, buttonY, buttonPressed, buttonPressed, buttonPressed, buttonPressed);
-      fill(color( 255, 255, 255, titleTransitionWhite));
-      rect(coordinateX, coordinateY, buttonX, buttonY, buttonPressed, buttonPressed, buttonPressed, buttonPressed);
-    }
+    rect(0,0,windowWidth,windowHeight);
 }

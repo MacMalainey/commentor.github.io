@@ -32,7 +32,7 @@ function richGame(diccionario) {
   var barHeight = 300;
   var barWidth = 50;
   var barSpace = 30;
-  var baseX = 50;
+  var baseX = 350;
   var baseY = 500;
   var xCor = 90;
   var firstBarSpace = 20;
@@ -61,11 +61,6 @@ function richGame(diccionario) {
 
 }
 
-function clearPage(initDimensions) {
-  console.log("We here.");
-  background('#ffffff');
-  drawBox(0,0,initDimensions[0], initDimensions[1]);
-}
 
 function endGame(initDimensions) {
   console.log("End Game");

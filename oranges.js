@@ -56,55 +56,38 @@ function setup() {
 }
 
 function draw() {
+  if(frameCount < 50 ){
+    fill(color(162, 188, 229, titleTransition));
+    rect(610, 450, 300, 100, 5, 5, 5, 5);
+    fill(color(255, 255, 255, titleTransitionWhite));
+    rect(610 - 10, 440, 300, 100, 5, 5, 5, 5);
+
+    fill(color(165, 199, 255, writing));
+    textFont('monospace', 50);
+    textSize(25);
+    text('START', 715 , 475, 600, 50);
+
+    titleScreen();
+
+    fill(color(255, 255, 255));
+
+  }
   if (page) {
     console.log(page);
     richGame(diccList[page]);
-  } if (page == 0) {
-    if (start == true) {
-      for (i=1; i<255; i++){
-      fade = fade++;
-      fill(color(255, 255, 255, fade));
-      rect(0 , 0, windowWidth, windowHeight, 5, 5, 5, 5);
-    }
-    if (start > 0) {
-      fill(color(255, 255, 255));
-      rect(0 , 0, windowWidth, windowHeight, 5, 5, 5, 5);
-    }
-    titleScreen();
-    fill(color(162, 188, 229, titleTransition));
-     rect(610, 450, 300, 100, 5, 5, 5, 5);
-   fill(color(255, 255, 255, titleTransitionWhite));
-    rect(610 - 10, 440, 300, 100, 5, 5, 5, 5);
-     start = 0;
-    }
-    titleScreen();
-    begin();
-  } else if (page >= diccList.length) {
+  }
+ else if (page >= diccList.length) {
     endGame();
   }
-}
   if (page) {
     console.log(page);
     richGame(diccList[page]);
-  } else {
-    if (start == true) {
-      for (i=1; i<255; i++){
-      fade = fade++;
-      fill(color(255, 255, 255, fade));
-      rect(0 , 0, windowWidth, windowHeight, 5, 5, 5, 5);
-    }
-    }
-    titleScreen();
-    begin();
   }
   }
-
-
-
 
 function mousePressed() {
   page++;
-  clearPage(initDimensions);
+
   if (page >= diccList.length) {
     endGame();
   }
