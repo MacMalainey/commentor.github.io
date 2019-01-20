@@ -31,4 +31,4 @@ python/test_module.py
 python/test.cpp
 python/test.py
 
-python/__pycache__/
+python/__pycache__/*
