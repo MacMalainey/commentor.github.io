@@ -74,8 +74,11 @@ def count_comments_and_code(formatted_info, mode):
         if (line == formatted_info[-1]): # Edge case for people who don't end their multiline comments
             temp_comment_counter, temp_code_counter = find_comment(line, comment_sym[mode], comment_sym_multi[mode], 1)
         else:
-            temp_comment_counter, temp_code_counter = find_comment(line, comment_sym[mode], comment_sym_multi[mode], 0)
-            edge_case_line = formatted_info.index(line)
+            try:    # Sometimes we get a none type, so we need this
+                temp_comment_counter, temp_code_counter = find_comment(line, comment_sym[mode], comment_sym_multi[mode], 0)
+                edge_case_line = formatted_info.index(line)
+            except:
+                return 0, 0
 
         if temp_comment_counter == -1: # Edge case for files that don't end their multiline comments
             comment_counter += len(formatted_info) - edge_case_line - 1
@@ -157,12 +160,12 @@ def find_comment(line, comment_sym, comment_sym_multi, last_line):
 # 1: c++, c, cs, java, javascript, kotlin
 def pick_mode(file_name):
     # the mode is python
-    if file_name[-3:] == ".py":
+    if file_name.lower()[-3:] == ".py":
         return 0
     # the mode is c++, c, cs, java, javascript, kotlin
-    if file_name[-4:] == ".cpp" or file_name[-2:] == ".c" or file_name[-3:] == ".cs" \
-    or file_name[-5::] == ".java" or file_name[-3::] == ".js" or file_name[-3:] ==".kt"\
-    or file_name[-6::] == ".swift":
+    if file_name.lower()[-4:] == ".cpp" or file_name.lower()[-2:] == ".c" or file_name.lower()[-3:] == ".cs" \
+    or file_name.lower()[-5::] == ".java" or file_name.lower()[-3::] == ".js" or file_name.lower()[-3:] ==".kt"\
+    or file_name.lower()[-6::] == ".swift" or file_name.lower()[-3::] == ".js":
         return 1
     else:
         return -1
