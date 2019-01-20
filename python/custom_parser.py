@@ -3,6 +3,8 @@ import re
 
 multi_comment_flag = 0
 multi_comment_char_sum = 0
+comment_sym = ["#", "//"] # Legal comment symbols
+comment_sym_multi = ['"""', "/*"] # Legal multiline comment symbols
 
 # reads input from stdin and dumps the contents into memory
 def read_input(args):
@@ -25,6 +27,7 @@ def read_input(args):
 
 # Removes garbage from the file
 def format_file(file_info, mode):
+    global comment_sym, comment_sym_multi
     stripped_lines = []
     formatted_lines = []
     lines = file_info.readlines()
@@ -34,7 +37,7 @@ def format_file(file_info, mode):
     for line in lines:
         if line == "\n":   # Ignore blank new lines
             pass
-        elif len(line) <= 2: # ignore lines that are length 2 or less
+        elif len(line) <= 2 and (not comment_sym_multi[mode] in line) and (not comment_sym_multi[mode][::-1] in line): # ignore lines that are length 2 for languages and does not contain their multiline comment delimiter
             pass
         else:
             stripped_lines.append(line.strip())    # strip blank space
@@ -43,10 +46,11 @@ def format_file(file_info, mode):
     for line in stripped_lines:
         if line == "\n":   # Ignore blank new lines
             pass
-        elif len(line) <= 2: # ignore lines that are length 2 or less
+        elif len(line) <= 2 and (not comment_sym_multi[mode] in line) and (not comment_sym_multi[mode][::-1] in line):
+            # ignore lines that are length 2 for languages and does not contain their multiline comment delimiter
             pass
         else:
-            formatted_lines.append(line.strip())
+            formatted_lines.append(line.strip())    # strip blank space
 
     return formatted_lines
 
@@ -60,14 +64,21 @@ def count_lines(formatted_info, mode):
 
 # Counts number of lines with comments
 def count_comments_and_code(formatted_info, mode):
-
-    comment_sym = ["#", "//"] # Legal comment symbols
-    comment_sym_multi = ['"""', "/*"] # Legal multiline comment symbols
+    global comment_sym, comment_sym_multi
     comment_counter = 0
     code_counter = 0
 
     for line in formatted_info:
-        temp_comment_counter, temp_code_counter = find_comment(line, comment_sym[mode], comment_sym_multi[mode])
+        if (line == formatted_info[-1]): # Edge case for people who don't end their multiline comments
+            temp_comment_counter, temp_code_counter = find_comment(line, comment_sym[mode], comment_sym_multi[mode], 1)
+        else:
+            temp_comment_counter, temp_code_counter = find_comment(line, comment_sym[mode], comment_sym_multi[mode], 0)
+            edge_case_line = formatted_info.index(line)
+
+        if temp_comment_counter == -1: # Edge case for files that don't end their multiline comments
+            comment_counter += len(formatted_info) - edge_case_line - 1
+            return comment_counter, code_counter
+
         comment_counter += temp_comment_counter
         code_counter += temp_code_counter
 
@@ -81,29 +92,33 @@ def determine_number_of_comments(comment_length):
     else:
         return round(comment_length / comment_length_constant)
 
-def find_comment(line, comment_sym, comment_sym_multi):
+def find_comment(line, comment_sym, comment_sym_multi, last_line):
     global multi_comment_flag, multi_comment_char_sum
-
     # If we are in the middle of a multiline comment, add the characters to the sum and return 0
-    if (multi_comment_flag == 1) and (comment_sym_multi not in line):
+    if (multi_comment_flag == 1) and (comment_sym_multi not in line) and (not last_line) and (comment_sym_multi[::-1] not in line):
         multi_comment_char_sum += len(line)
         return 0, 0
 
-    # multiline comments
-    elif comment_sym_multi in line:
+    elif (comment_sym_multi in line):
         # if the flag is not set, set it and start counting
         if multi_comment_flag == 0:
             multi_comment_char_sum += len(line)
             multi_comment_flag = 1
             return 0, 0
-        else:
-            multi_comment_char_sum += len(line) - len(comment_sym_multi) * 2 #subtract off the length of the symbols
-            multi_comment_flag = 0
 
-            comment_len = determine_number_of_comments(multi_comment_char_sum)
+    # multiline comments
+    elif (comment_sym_multi[::-1] in line) and (multi_comment_flag == 1):
+        multi_comment_char_sum += len(line) - len(comment_sym_multi) * 2 #subtract off the length of the symbols
+        multi_comment_flag = 0
 
-            multi_comment_char_sum = 0
-            return comment_len, 0
+        comment_len = determine_number_of_comments(multi_comment_char_sum)
+
+        multi_comment_char_sum = 0
+        return comment_len, 0
+
+    elif(multi_comment_flag and last_line):
+        return -1, 0
+
 
     # single line comments
     elif line[0:len(comment_sym)] == comment_sym:  # If we detect a comment at the beginning of a line
@@ -134,7 +149,7 @@ def find_comment(line, comment_sym, comment_sym_multi):
 def pick_mode(file_name):
     if file_name[-3:] == ".py": # the mode is python
         return 0
-    if file_name[-3:] == ".cpp": # the mode is c++
+    if file_name[-4:] == ".cpp": # the mode is c++
         return 1
     else:
         return -1
@@ -162,6 +177,6 @@ if __name__ == "__main__":
         formatted_info = format_file(file_info, mode) # format the file
         line_count = count_lines(formatted_info, mode)
         comment_count, code_count = count_comments_and_code(formatted_info, mode)
-        print(line_count)
-        print(comment_count)
-        print(code_count)
+        print("lines: " + str(line_count))
+        print("Comment: " + str(comment_count))
+        print("Code: " + str(code_count))
