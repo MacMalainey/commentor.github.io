@@ -1,5 +1,4 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # dependencies
 /node_modules
 /.pnp
@@ -27,8 +26,7 @@ python/private.py
 
 # Parser test files
 python/out
-python/test_module.py
-python/test.cpp
-python/test.py
+python/test_mule.py
+python/test*
 
 python/__pycache__/
