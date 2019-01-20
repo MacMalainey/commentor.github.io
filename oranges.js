@@ -1,3 +1,5 @@
+var page = 0;
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
   noStroke();
@@ -7,4 +9,11 @@ function setup() {
 
 function draw() {
   titleScreen();
+  if (page) {
+    richGame(page);
+  }
+}
+
+function mousePressed() {
+  page++;
 }

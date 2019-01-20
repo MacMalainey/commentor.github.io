@@ -29,3 +29,8 @@ function titleScreen(){
   text('Mac Malainey, Hudson Shykowski, Richmond Naviza, Lora Ma', 618 , 278, 600, 50);
 
 }
+
+function printBox(fraction) {
+    var barHeight = 20;
+
+}
