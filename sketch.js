@@ -63,7 +63,7 @@ function begin(){
       rect(coordinateX + 10, coordinateY + 10, buttonX, buttonY, buttonPressed, buttonPressed, buttonPressed, buttonPressed);
       fill(color( 255, 255, 255, titleTransitionWhite));
       rect(coordinateX, coordinateY, buttonX, buttonY, buttonPressed, buttonPressed, buttonPressed, buttonPressed);
-    }
+    } 
     start = true;
   }
 

@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 var fade = 0;
+=======
+var page = 0;
+
+>>>>>>> 04d4a3ae09f09f04fd90c283a873a0180f3190b4
 function setup() {
   createCanvas(windowWidth, windowHeight);
   noStroke();
@@ -15,7 +20,17 @@ function draw() {
   }
   }
   titleScreen();
+<<<<<<< HEAD
   begin();
 
 
+=======
+  if (page) {
+    richGame(page);
+  }
+}
+
+function mousePressed() {
+  page++;
+>>>>>>> 04d4a3ae09f09f04fd90c283a873a0180f3190b4
 }
