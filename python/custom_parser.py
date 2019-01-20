@@ -33,10 +33,8 @@ def format_file(file_info, mode):
     if __name__ == "__main__":
         lines = file_info.readlines()
         file_info.close()
-        print(lines)
     else:
         lines = file_info.split("\n")
-        print(lines)
 
     # remove new line characters from the text and strip blankspace
     for line in lines:
@@ -56,7 +54,6 @@ def format_file(file_info, mode):
             pass
         else:
             formatted_lines.append(line.strip())    # strip blank space
-
     return formatted_lines
 
 # Counts the number of total lines
@@ -99,6 +96,12 @@ def determine_number_of_comments(comment_length):
 
 def find_comment(line, comment_sym, comment_sym_multi, last_line):
     global multi_comment_flag, multi_comment_char_sum
+    #multiline comments on one line
+    if(comment_sym_multi in line):
+        phrase = re.search('/\*.*?\*/', line) # For cpp, c, c#
+        if(phrase):
+            return determine_number_of_comments(len(line)), 0;
+
     # If we are in the middle of a multiline comment, add the characters to the sum and return 0
     if (multi_comment_flag == 1) and (comment_sym_multi not in line) and (not last_line) and (comment_sym_multi[::-1] not in line):
         multi_comment_char_sum += len(line)
@@ -150,11 +153,11 @@ def find_comment(line, comment_sym, comment_sym_multi, last_line):
 # Modes:
 # -1: We will not parse this
 # 0: python
-# 1: c++
+# 1: c++ or c
 def pick_mode(file_name):
     if file_name[-3:] == ".py": # the mode is python
         return 0
-    if file_name[-4:] == ".cpp": # the mode is c++
+    if file_name[-4:] == ".cpp" or file_name[-2:] == ".c": # the mode is c++
         return 1
     else:
         return -1
