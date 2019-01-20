@@ -47,7 +47,6 @@ var dicc3 = {
   "90-100": 0.78
 };
 var diccList = [dicc0, dicc1, dicc2, dicc3];
-
 function setup() {
   createCanvas(windowWidth, windowHeight);
   noStroke();
@@ -67,6 +66,16 @@ function draw() {
       fill(color(255, 255, 255, fade));
       rect(0 , 0, windowWidth, windowHeight, 5, 5, 5, 5);
     }
+    if (start > 0) {
+      fill(color(255, 255, 255));
+      rect(0 , 0, windowWidth, windowHeight, 5, 5, 5, 5);
+    }
+    titleScreen();
+    fill(color(162, 188, 229, titleTransition));
+     rect(610, 450, 300, 100, 5, 5, 5, 5);
+   fill(color(255, 255, 255, titleTransitionWhite));
+    rect(610 - 10, 440, 300, 100, 5, 5, 5, 5);
+     start = 0;
     }
     titleScreen();
     begin();
@@ -74,10 +83,6 @@ function draw() {
     endGame();
   }
 }
-
-function draw() {
-
-
   if (page) {
     console.log(page);
     richGame(diccList[page]);
@@ -92,7 +97,9 @@ function draw() {
     titleScreen();
     begin();
   }
-}
+  }
+
+
 
 
 function mousePressed() {
