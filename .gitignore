@@ -29,4 +29,4 @@ python/out
 python/test_mule.py
 python/test*
 
-python/__pycache__/
+python/__pycache__/*
