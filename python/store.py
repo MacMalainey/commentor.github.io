@@ -21,7 +21,8 @@ def addData(page, repo, code, comments):
     database_lock.release()
 
 def close():
-    pass
+    cursor.close()
+    conn.close()
 
 
 

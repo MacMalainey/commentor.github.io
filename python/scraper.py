@@ -16,7 +16,7 @@ def begin(thread_count):
     global current_repo, repos, threads
     if threads is not None:
         raise Exception()
-    current_repo = 43678
+    current_repo = 96538378
     repos = gcontext.get_repos()
     threads = [None] * thread_count
     for i in range(0, thread_count):
@@ -60,6 +60,7 @@ class scraper(threading.Thread):
                     line += nline
                     comment += ncomment
                     code += ncode
+                    print(__name__ + " lines done: " + str(line))
             elif file.type == 'dir':
                 line, comment, code = self.parse_folder(repo, path + file.name + '/', line, comment, code)
         return line, comment, code
@@ -69,7 +70,7 @@ class scraper(threading.Thread):
         self.local.terminate = False
         # while not self.local.terminate:
         repo = poll_repo()
-        while repo is not None:
+        while repo is None:
             repo = poll_repo()
         # Getting repo information
         line, comment, code = self.parse_folder(repo, "/", 0, 0, 0)
