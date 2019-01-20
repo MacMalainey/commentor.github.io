@@ -139,11 +139,11 @@ def find_comment(line, comment_sym, comment_sym_multi, last_line):
         if(phrase):
             # remove text from line
             line = line.replace('"' + phrase.group() + '"', '')
-            return find_comment(line, comment_sym, comment_sym_multi) # Recurse with text removed
+            return find_comment(line, comment_sym, comment_sym_multi, 0) # Recurse with text removed
         elif(phrase2):
             # remove text from line
             line = line.replace("'" + phrase2.group() + "'", '')
-            return find_comment(line, comment_sym, comment_sym_multi) # Recurse with text removed
+            return find_comment(line, comment_sym, comment_sym_multi, 0) # Recurse with text removed
         else:
             return determine_number_of_comments(len(line)), 1
 
@@ -153,11 +153,13 @@ def find_comment(line, comment_sym, comment_sym_multi, last_line):
 # Modes:
 # -1: We will not parse this
 # 0: python
-# 1: c++ or c
+# 1: c++ or c or cs or java or javascript
 def pick_mode(file_name):
-    if file_name[-3:] == ".py": # the mode is python
+    # the mode is python
+    if file_name[-3:] == ".py":
         return 0
-    if file_name[-4:] == ".cpp" or file_name[-2:] == ".c": # the mode is c++
+    # the mode is c++ or c or cs java or javascript
+    if file_name[-4:] == ".cpp" or file_name[-2:] == ".c" or file_name[-3:] == ".cs" or file_name[-5::] == ".java" or file_name[-3::] == ".js":
         return 1
     else:
         return -1
