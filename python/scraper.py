@@ -1,7 +1,7 @@
 from github import Github
 import private
 import threading
-# TODO import parser after renamed
+from custom_parser import parse_code
 from base64 import b64decode
 
 gcontext = Github(private.GITHUB_API_KEY)
@@ -34,13 +34,13 @@ class scraper(threading.Thread):
         folder = repo.get_dir_contents(path)
         for file in folder:
             if file.type == 'file':
-                nline, ncomment, ncode = parse_code(file.name, b64decode(file.get_contents))
+                nline, ncomment, ncode = parse_code(file.name, b64decode(file.get_contents).decode("ASCII"))
                 line += nline
                 comment += ncomment
                 code += ncode
             elif file.type == 'dir':
                 line, comment, code = self.parse_folder(repo, path + file.name + '/', line, comment, code)
-            # return line, comment, code
+            return line, comment, code
     
     def run(self):
         self.local = threading.local()
