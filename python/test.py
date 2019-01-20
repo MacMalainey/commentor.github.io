@@ -1,6 +1,7 @@
 import pygame, colors, player, army, enemy, math, text, random, time, camera, bullet, powerup
 
 # Spawns an item based on the current time
+
 def spawnItem(time, frequency):
     if (time % frequency) == 0:
         return True
@@ -13,7 +14,6 @@ def spawnEnemies(count, multiplier):
         return (True, 1, multiplier + 0.01)
     else:
         return (False, count, multiplier)
-
 # Handles the reset screen
 def reset(player1, all_enemies, PLAYER_HEALTH, WIDTH, HEIGHT, screen, all_graves, all_armies, all_powerups):
     for i in all_enemies:
@@ -232,8 +232,7 @@ def main():
 
         # *after* drawing everything, flip the display
         pygame.display.flip()
-
+"""
     pygame.quit()
-
 if __name__=="__main__":
     main()
