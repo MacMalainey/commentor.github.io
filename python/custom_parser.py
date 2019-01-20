@@ -74,8 +74,11 @@ def count_comments_and_code(formatted_info, mode):
         if (line == formatted_info[-1]): # Edge case for people who don't end their multiline comments
             temp_comment_counter, temp_code_counter = find_comment(line, comment_sym[mode], comment_sym_multi[mode], 1)
         else:
-            temp_comment_counter, temp_code_counter = find_comment(line, comment_sym[mode], comment_sym_multi[mode], 0)
-            edge_case_line = formatted_info.index(line)
+            try:    # Sometimes we get a none type, so we need this
+                temp_comment_counter, temp_code_counter = find_comment(line, comment_sym[mode], comment_sym_multi[mode], 0)
+                edge_case_line = formatted_info.index(line)
+            except:
+                pass
 
         if temp_comment_counter == -1: # Edge case for files that don't end their multiline comments
             comment_counter += len(formatted_info) - edge_case_line - 1
