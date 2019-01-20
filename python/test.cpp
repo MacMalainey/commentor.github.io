@@ -660,6 +660,7 @@ void play_game_solo() {
           // Sets all your enemy's blocks to hidden but not shot
           game_arr[determine_array_element(opponent[i])].updateEnemy(8);
         }
+
         /* If we make it down here
          it means the arduino has selected its tiles
          So we should update the gamestate

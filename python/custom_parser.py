@@ -69,14 +69,14 @@ def count_comments_and_code(formatted_info, mode):
     code_counter = 0
 
     for line in formatted_info:
-        if (line == formatted_info[-1]):
-            print(line)
+        if (line == formatted_info[-1]): # Edge case for people who don't end their multiline comments
             temp_comment_counter, temp_code_counter = find_comment(line, comment_sym[mode], comment_sym_multi[mode], 1)
         else:
             temp_comment_counter, temp_code_counter = find_comment(line, comment_sym[mode], comment_sym_multi[mode], 0)
+            edge_case_line = formatted_info.index(line)
 
         if temp_comment_counter == -1: # Edge case for files that don't end their multiline comments
-            comment_counter = len(formatted_info) - code_counter
+            comment_counter += len(formatted_info) - edge_case_line - 1
             return comment_counter, code_counter
 
         comment_counter += temp_comment_counter
@@ -94,29 +94,31 @@ def determine_number_of_comments(comment_length):
 
 def find_comment(line, comment_sym, comment_sym_multi, last_line):
     global multi_comment_flag, multi_comment_char_sum
-
     # If we are in the middle of a multiline comment, add the characters to the sum and return 0
-    if (multi_comment_flag == 1) and (comment_sym_multi not in line) and (not last_line):
+    if (multi_comment_flag == 1) and (comment_sym_multi not in line) and (not last_line) and (comment_sym_multi[::-1] not in line):
         multi_comment_char_sum += len(line)
         return 0, 0
 
-    # multiline comments
-    elif (comment_sym_multi in line) or (multi_comment_flag and last_line):
+    elif (comment_sym_multi in line):
         # if the flag is not set, set it and start counting
         if multi_comment_flag == 0:
             multi_comment_char_sum += len(line)
             multi_comment_flag = 1
             return 0, 0
-        elif(multi_comment_flag and last_line):
-            return -1, 0
-        else:
-            multi_comment_char_sum += len(line) - len(comment_sym_multi) * 2 #subtract off the length of the symbols
-            multi_comment_flag = 0
 
-            comment_len = determine_number_of_comments(multi_comment_char_sum)
+    # multiline comments
+    elif (comment_sym_multi[::-1] in line) and (multi_comment_flag == 1):
+        multi_comment_char_sum += len(line) - len(comment_sym_multi) * 2 #subtract off the length of the symbols
+        multi_comment_flag = 0
 
-            multi_comment_char_sum = 0
-            return comment_len, 0
+        comment_len = determine_number_of_comments(multi_comment_char_sum)
+
+        multi_comment_char_sum = 0
+        return comment_len, 0
+
+    elif(multi_comment_flag and last_line):
+        return -1, 0
+
 
     # single line comments
     elif line[0:len(comment_sym)] == comment_sym:  # If we detect a comment at the beginning of a line
