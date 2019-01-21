@@ -70,18 +70,12 @@ def count_comments_and_code(formatted_info, mode):
     comment_counter = 0
     code_counter = 0
     for line in formatted_info:
-        if (line == formatted_info[-1]): # Edge case for people who don't end their multiline comments
-            temp_comment_counter, temp_code_counter = find_comment(line, comment_sym[mode], comment_sym_multi[mode], 1, mode)
+        if (multi_comment_flag == 1) and (line == formatted_info[-1]): # For if someone doesnt end a multiline comment
+            return 0, 0 # Return 0, 0 since we cannot determine what is a comment or not
         else:
-            temp_comment_counter, temp_code_counter = find_comment(line, comment_sym[mode], comment_sym_multi[mode], 0, mode)
-            edge_case_line = formatted_info.index(line)
-
-        if temp_comment_counter == -1: # Edge case for files that don't end their multiline comments
-            comment_counter += len(formatted_info) - edge_case_line - 1
-            return comment_counter, code_counter
-
-        comment_counter += temp_comment_counter
-        code_counter += temp_code_counter
+            temp_comment_counter, temp_code_counter = find_comment(line, comment_sym[mode], comment_sym_multi[mode], mode)
+            comment_counter += temp_comment_counter
+            code_counter += temp_code_counter
 
     return comment_counter, code_counter
 
@@ -93,7 +87,7 @@ def determine_number_of_comments(comment_length):
     else:
         return round(comment_length / comment_length_constant)
 
-def find_comment(line, comment_sym, comment_sym_multi, last_line, mode):
+def find_comment(line, comment_sym, comment_sym_multi, mode):
     global multi_comment_flag, multi_comment_char_sum
 
     #multiline comments on one line
@@ -101,24 +95,24 @@ def find_comment(line, comment_sym, comment_sym_multi, last_line, mode):
         if(mode == 0):
             phrase = re.search('\"\"\".*?\"\"\"', line) # For python
         elif(mode == 1):
-            phrase = re.search('/\*.*?\*/', line) # For cpp, c, c#
+            phrase = re.search('/\*.*?\*/', line) # For cpp, c, c#, etc
 
         if(phrase):
-            return determine_number_of_comments(len(line)), 0;
+            return determine_number_of_comments(len(phrase.group())), 0;
 
     # If we are in the middle of a multiline comment, add the characters to the sum and return 0
-    if (multi_comment_flag == 1) and (comment_sym_multi not in line) and (not last_line) and (comment_sym_multi[::-1] not in line):
+    if (multi_comment_flag == 1) and (comment_sym_multi[::-1] not in line):
         multi_comment_char_sum += len(line)
         return 0, 0
 
-    elif (comment_sym_multi in line):
+    # multiline comments
+    elif (comment_sym_multi in line) and (multi_comment_flag == 0):
         # if the flag is not set, set it and start counting
         if multi_comment_flag == 0:
             multi_comment_char_sum += len(line)
             multi_comment_flag = 1
             return 0, 0
 
-    # multiline comments
     elif (comment_sym_multi[::-1] in line) and (multi_comment_flag == 1):
         multi_comment_char_sum += len(line) - len(comment_sym_multi) * 2 #subtract off the length of the symbols
         multi_comment_flag = 0
@@ -127,10 +121,6 @@ def find_comment(line, comment_sym, comment_sym_multi, last_line, mode):
 
         multi_comment_char_sum = 0
         return comment_len, 0
-
-    elif(multi_comment_flag and last_line):
-        return -1, 0
-
 
     # single line comments
     elif line[0:len(comment_sym)] == comment_sym:  # If we detect a comment at the beginning of a line
@@ -143,11 +133,11 @@ def find_comment(line, comment_sym, comment_sym_multi, last_line, mode):
         if(phrase):
             # remove text from line
             line = line.replace('"' + phrase.group() + '"', '')
-            return find_comment(line, comment_sym, comment_sym_multi, 0, mode) # Recurse with text removed
+            return find_comment(line, comment_sym, comment_sym_multi, mode) # Recurse with text removed
         elif(phrase2):
             # remove text from line
             line = line.replace("'" + phrase2.group() + "'", '')
-            return find_comment(line, comment_sym, comment_sym_multi, 0, mode) # Recurse with text removed
+            return find_comment(line, comment_sym, comment_sym_multi, mode) # Recurse with text removed
         else:
             return determine_number_of_comments(len(line)), 1
 

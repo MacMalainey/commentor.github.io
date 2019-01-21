@@ -6,8 +6,17 @@ from base64 import b64decode
 from time import sleep, time
 from store import add_data, setup
 
-gcontext = Github(private.GITHUB_API_KEY2)
-repos = gcontext.search_repositories(query='language:python')
+legal_languages = ["C++", "python", "C", "java", "swift", "javascript", "kotlin"]
+
+thread_nums = input("Enter a number of threads (integar): ")
+language = input("Enter the language you want to search for. Options: C++, python, C, java, swift, javascript, kotlin: ")
+keyword = input("Enter a keyword the title that you want to seach for, or press ENTER to skip: ")
+print("")
+while(language not in legal_languages):
+    language = input("Not a valid language. Options: C++, python, C, java, swift, javascript, kotlin")
+
+gcontext = Github(private.GITHUB_API_KEY)
+repos = gcontext.search_repositories(query='language:' + language)
 current_repo = 100
 threads = None
 lock = threading.Lock()
@@ -25,22 +34,40 @@ def begin(thread_count):
 
 def poll_repo():
     global current_repo, repos, lock
+    print("Thread " + str(threading.get_ident()) + " is searching for a new repo...")
+    repo = ""
     lock.acquire()
-    try:  #
-        repo = gcontext.get_repo(repos[current_repo].full_name, lazy=False)
-        print(repos[current_repo].full_name)
-    except RateLimitExceededException:
-        seconds_till_reset = gcontext.rate_limiting_resettime - time()
-        print("sleeping: " + str(seconds_till_reset))
-        sleep(seconds_till_reset)
-        repo = gcontext.get_repo(repos[current_repo].full_name, lazy=False)
-        print(repos[current_repo].full_name)
-    except GithubException:
-        current_repo+=1
-        return None
-    current_repo+=1
+    while(repo == ""):
+        try: # Try to get a repo
+            target_repo = repos[current_repo].full_name
+        except RateLimitExceededException:
+            seconds_till_reset = gcontext.rate_limiting_resettime - time()
+            print("sleeping: " + str(seconds_till_reset))
+            sleep(seconds_till_reset)
+            if(keyword in target_repo):
+                repo = gcontext.get_repo(target_repo, lazy=False)
+
+        # print(target_repo) uncomment to view repo currently being viewed
+
+        try: # continually get repos until it matches our query
+            if(keyword in target_repo):
+                repo = gcontext.get_repo(target_repo, lazy=False)
+            current_repo+=1
+        except RateLimitExceededException:
+            seconds_till_reset = gcontext.rate_limiting_resettime - time()
+            print("sleeping: " + str(seconds_till_reset))
+            sleep(seconds_till_reset)
+            if(keyword in target_repo):
+                repo = gcontext.get_repo(target_repo, lazy=False)
+            current_repo+=1
+        except GithubException:
+            seconds_till_reset = gcontext.rate_limiting_resettime - time()
+            print("API limit exceeded...sleeping: " + str(seconds_till_reset))
+            sleep(seconds_till_reset)
+            current_repo+=1
     lock.release()
     return repo
+
 
 
 class scraper(threading.Thread):
@@ -50,7 +77,7 @@ class scraper(threading.Thread):
             folder = repo.get_dir_contents(path)
         except RateLimitExceededException:
             seconds_till_reset = gcontext.rate_limiting_resettime - time()
-            print("sleeping: " + str(seconds_till_reset))
+            print("API limit exceeded...sleeping: " + str(seconds_till_reset))
             sleep(seconds_till_reset)
             folder = repo.get_dir_contents(path)
         except GithubException:
@@ -64,12 +91,14 @@ class scraper(threading.Thread):
                         line += nline
                         comment += ncomment
                         code += ncode
-                except (GithubException, TypeError, UnboundLocalError) as Error:
+                except (GithubException, UnboundLocalError) as Error:
+                    print("File size too large in " + repo.full_name + ", skipping...")
                     pass
             elif file.type == 'dir':
                 try:
                     line, comment, code = self.parse_folder(repo, path + file.name + '/', line, comment, code)
-                except (GithubException, TypeError, UnboundLocalError) as Error:
+                except (GithubException, UnboundLocalError) as Error:
+                    print("File size too large, skipping...")
                     pass
         return line, comment, code
 
@@ -85,12 +114,14 @@ class scraper(threading.Thread):
             while repo is None:
                 repo = poll_repo()
             # Getting repo information
+            print("Repo started: " + repo.full_name)
+            print("")
             line, comment, code = self.parse_folder(repo, "/", 0, 0, 0)
             if(code == 0 or comment == 0 or line == 0):
-                print("skipped due to irregularity.")
+                print("skipped " + "due to irregularity.")
             elif line > 0:
                 print("For repo " + repo.full_name)
-                print("Lines: " + str(line) + " Comments: " + str(comment) + " Code: " + str(code))
+                print("Comments: " + str(comment) + " Code: " + str(code) + " Percent of code commented: " + str(round(comment/code * 100)) + "%")
                 print("")
                 #add_data(current_repo, repo, code, comment, gcontext)
             else:
@@ -98,4 +129,4 @@ class scraper(threading.Thread):
 
 
 if(__name__) == "__main__":
-    begin(1)
+    begin(int(thread_nums))
