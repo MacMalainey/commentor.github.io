@@ -17,7 +17,7 @@ while(language not in legal_languages):
 
 gcontext = Github(private.GITHUB_API_KEY)
 repos = gcontext.search_repositories(query='language:' + language)
-current_repo = 100
+current_repo = 0
 threads = None
 lock = threading.Lock()
 
